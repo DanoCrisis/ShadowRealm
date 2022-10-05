@@ -183,6 +183,26 @@ dwarf_stats =   [20, 1.6,   0.3,       0,       0,     0.6,    0,    15,       0
 elven_stats =   [ 0,   1,   0.1,       2,     0.5,     0.3,  0.6,    10,     0.5,   0.05,     0,  0.05 ]
 
 
+# ------------------------------------------- Player Skills ------------------------------------------------------------------------
+# Multipliers = Speed / Attack / Additional Critical Chance / Stamina or Mana Usage
+
+ditch_attack = ["Ditch attack", 1, 0.6, 0, 0, "A weak attack that can be performed when low on stamina. "]  
+last_reserve = ["Last reserve", 1, 0.6, 0, 0, "A weak spell that can be performed when low on mana. "]   
+regroup = ["Regroup", 2, 0, 0, 0, "Step back from battle and try to evade attacks while you recover your full stamina. "]
+focus = ["Focus", 2, 0, 0, 0, "Step back from battle and try to evade attacks while you recover your full mana. "]
+precision_attack = ["Precision attack", 0.8, 0.6, 0, 2, "A weak and slow attack, but it never misses. "]
+piercing_attack = ["Piercing attack", 1, 1, 0, 3, "A thrusting attack that negates enemy armour. "]
+fireball = ["Fireball", 1, 1.2, 0, 3, "Sends out a ball of flame, to one enemy, that hits for good damage and a chance to burn."]
+
+fury = ["Fury", 1, 1, 0, 3, "Harness the rage and attack, while increasing your speed and power for two turns. "]
+critical_targeting = ["Critical targeting", 1, 1, 0, 3, "Assess the enemy's weaknesses; allowing you to score critical hits for two turns. "]
+heavy_blow = ["Heavy blow", 0.8, 1.2, 0.05, 3, "A heavy attack with a chance to knock your enemy down. "]
+
+
+skills_able_to_learn = []                                                           # Skills your player can learn at current time
+player_skills = []                                                                   # Skills your player has learned
+stage = 1                                                                            # Keeps track of the stage the player is at
+
 
 
 # A list of the items the player has equipped in different slots------------------------------------------------------------------------
@@ -274,8 +294,338 @@ def character_sheet():
 
 # -------------------------------------------------- Makeshift Camp Area ---------------------------------------------------------------------------
 
+def learn_skills(stage, reloaded):
+    if (player[28]-len(player_skills)) < 1:
+        print_s_c(f"Finello: “I'm sorry you have no ability to learn new skills now.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+    elif (player[28]-len(player_skills)) == 1:
+        print_s_c(f"Finello: “Now lets see, you have the ability to learn another skill.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+    else:
+        print_s_c(f"Finello: “Now lets see, you have the ability to learn {(player[28]-len(player_skills))} skills.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+    print_s_c("Finello: “Currently I can teach you one of the following skills:” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    if stage == 1 and reloaded == False:
+        skills_able_to_learn.append(precision_attack)                 
+        if player[25] == "Wizard" and player[24] == "Dwarf":
+            skills_able_to_learn.append(ditch_attack)
+        elif  player[25] == "Wizard" and player[24] != "Dwarf":
+            skills_able_to_learn.append(last_reserve)
+            skills_able_to_learn.append(focus)
+            skills_able_to_learn.append(fireball)
+        elif player[25] == "Warrior" or player[25] == "Knight":
+            skills_able_to_learn.append(ditch_attack)
+            skills_able_to_learn.append(regroup)
+            skills_able_to_learn.append(piercing_attack)
+        if player[24] == "Dwarf":
+            skills_able_to_learn.append(heavy_blow)
+        elif player[24] == "Human":
+            skills_able_to_learn.append(fury)
+        elif player[24] == "Elf":
+            skills_able_to_learn.append(critical_targeting)
+    elif stage == 16 and reloaded == False:                             # Additional skills for later stages need adding --------------- xqf
+        pass
+    elif stage == 31 and reloaded == False:
+        pass
+    elif stage == 46 and reloaded == False:
+        pass
+    elif stage == 61 and reloaded == False:
+        pass
+    num = 1
+    list = ""
+    for skill in skills_able_to_learn:
+        print_c(f"{str(num)}. {skill[0]} - Cost {str(skill[4])} {player[29]} - {skill[5]} ", color=Fore.WHITE, brightness=Style.BRIGHT)
+        time.sleep(2)
+        print()
+        if num < len(skills_able_to_learn):
+            list += str(num)
+            list += ", "
+        num += 1
+    time.sleep(1)
+    print()
+    print_s_c("Finello: “Which skill would you like to learn?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    question = f"{list}or {len(skills_able_to_learn)}? "
+    answer = input(question)
+    print()
+    if answer.isdigit() == True and 0 < int(answer) <= len(skills_able_to_learn):
+        player_skills.append(skills_able_to_learn[int(answer)-1])
+        print_c(f"{player[0]} learned the {skills_able_to_learn[int(answer)-1][0]} skill. ", color=Fore.YELLOW, brightness=Style.BRIGHT)   
+        skills_able_to_learn.remove(skills_able_to_learn[int(answer)-1]) 
+        print()
+        time.sleep(1)
+        
+    else:
+        print_s_c("Finello: “I didn't understand you there, let me repeat that.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+        learn_skills(stage, True)
+
+    if len(player_skills) < player[28]:
+        learn_skills(stage, True)
+
+    else:
+        print_s_c("Finello: “Okay that's all I can teach you for now.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+
+
 def makeshift_camp():
     time.sleep(2)
+    print()
+    print()
+    print_c("  __  __       _             _     _  __ _      ____                      ", color=Fore.CYAN, brightness=Style.BRIGHT)
+    print_c(" |  \/  | __ _| | _____  ___| |__ (_)/ _| |_   / ___|__ _ _ __ ___  _ __  ", color=Fore.CYAN, brightness=Style.BRIGHT)
+    print_c(" | |\/| |/ _` | |/ / _ \/ __| '_ \| | |_| __| | |   / _` | '_ ` _ \| '_ \ ", color=Fore.CYAN, brightness=Style.BRIGHT)
+    print_c(" | |  | | (_| |   <  __/\__ \ | | | |  _| |_  | |__| (_| | | | | | | |_) |", color=Fore.CYAN, brightness=Style.BRIGHT)
+    print_c(" |_|  |_|\__,_|_|\_\___||___/_| |_|_|_|  \__|  \____\__,_|_| |_| |_| .__/ ", color=Fore.CYAN, brightness=Style.BRIGHT)
+    print_c("                                                                   |_|    ", color=Fore.CYAN, brightness=Style.BRIGHT)
+    time.sleep(2)
+    print()
+    print()
+    time.sleep(2)
+    print()
+    print()
+    print_s_c("The camp is little more than a couple of wooden shacks and several large tents. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Most of these seem to be housing wounded soldiers and villagers. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("A lovely aroma seems to be coming from one tent, and you make a beeline for that. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Upon entering; you see a friendly elf dishing out hot soup into wooden bowls. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("You take a bowl for yourself and wolf it down, not realising how hungry you were. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("After you're done, you thank the elf and ask if she knows a Carla. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("She points you in the direction of a stout dwarf sorting through items in the back of a cart. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(2)
+    print()
+    print()
+    print_s_c("You walk over and tap the distracted dwarf on the shoulder. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Excuse me are you Carla?” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Yeah that's me, whadya want? I'm busy here.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Sorry, Orlan said you might be able to help me out with a few items.” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Look. I don't know what Orlan said but I've been able to salvage very little.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “And what I do have, I will need to sell to get back on my feet.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “I suppose I can let you have these potions I found…” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print()
+    print_c(f"{player[0]} receives 3 * Small Health Potion", color=Fore.YELLOW, brightness=Style.BRIGHT)    # ----- Add this to potion inventory ------xqf
+    print()
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “But you will have to check back later if you want anything more, and it'll cost ya.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Course if you find anything of use out in the wilds, I'd be happy to buy it from you.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Thank you; if I am back this way again I will trade with you.” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Well with any luck I will be able to get this cart back on the road soon.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Then I can bring my wares to you.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “By the way, do you happen to know where I can find Finello?” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “What that crazy old man, thinks he's some sort of sage?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Yeah he's by the stream collecting water.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Carla: “Don't go believing his stories though; he would have to have lived twenty lifetimes for all he says to be true.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("And with that she turns back to sorting through her inventory. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("Leaving her to it; you head down towards the stream. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(2)
+    print()
+    print()
+    print_s_c("You see on old man with a walking stick, wearing a plain brown robe. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("He is knelt down by the river with his back towards you. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("As you approach; he suddenly leaps up and spins around, brandishing his stick like a spear. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    if player[1] == "Elf":
+        print_s_c(f"Finello: “What is an {player[24]} like you doing sneaking up on an old man?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)          
+        print()
+    else:
+        print_s_c(f"Finello: “What is a {player[24]} like you doing sneaking up on an old man?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+    print_s_c(f"{player[0]}: “I'm sorry I didn't mean to startle you; Orlan said you wanted to speak with me?” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("He relaxes and rests on his walking stick.", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Finello: “Ah so you're the {player[25]} that got knocked out cold.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)                  
+    print()
+    if player[24] == "Dwarf" and player[25] == "Wizard":
+        print_s_c("Finello: “But you're a Dwarf, you can't do magic!” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+        print_s_c("Finello: : “What are you going to do with that staff, whack people on the head with it?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+        print_s_c("Finello: : “Oh never mind, I may still be able to teach you a skill or two if you like?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+    else:
+        print_s_c(f"Finello: “I used to be a {player[25]} myself back in the day.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)               
+        print()
+        if player[25] == "Warrior":
+            print_s_c("Finello: “I once sliced a troll's head clean off.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+            time.sleep(1)
+            print()
+        elif player[25] == "Knight":
+            print_s_c("Finello: “I once held off a mountain lion with just my shield.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+            time.sleep(1)
+            print()
+        elif player[25] == "Wizard":
+            print_s_c("Finello: “I once burned a whole horde of zombies to ash.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+            time.sleep(1)
+            print()
+        print_s_c("Finello: “I'm sure you're capable but I could teach you a skill or two if you like?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+        time.sleep(1)
+        print()
+
+    print_s_c("Would you like to learn some skills? ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    answer = input("Yes or No? ")
+    if answer.lower() == "yes" or  answer.lower() == "y":
+        print()
+        learn_skills(stage, False)                                                      
+    else:
+        print()
+        print_s("Are you sure? Learning skills will aid you in battle. ")
+        print()
+        print_s("Learn some skills? ")
+        print()
+        answer_1 = input("Yes or No? ")
+        if answer_1.lower() == "yes" or  answer_1.lower() == "y":
+            print()
+            learn_skills(stage, False)
+        else:
+            print()
+            print_s_c("Finello: “Well okay but don't come crying to me if things get tough.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+            time.sleep(1)
+            print()
+
+    print_s_c("Finello: “Good luck out there.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("You thank the old man and head back towards the main camp. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("From there you see the main road and begin to head towards it. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “Hey {player[0]}! Where do you think your going?” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Hey Orlan; this road leads to the main town, and then onto the volcano doesn't it?” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “Yes but you can't just waltz up there plain as day.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “The shadows up ahead become too dense, and anyone that walks through does not return.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “The heroes that set off before you made their way up the forest path.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("He points off to a small path on the right that winds through the forest. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “Now I'm not saying that way is safe, but you will have a better chance going that way.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “Me and the others at the camp are going to gather as many people as we can and form a caravan.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “We will push on down the main road as far as we can and hopefully meet you up ahead.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Okay Orlan; if you think that is best, I will follow your route.” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “However don't push on down the road if the shadows become too much.” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Hopefully I will find a way to clear them, but if not don't lead your people into danger.” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “We will do what we must, I see no other way of ever leaving the island.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"{player[0]}: “Then just give me time enough to give you a fighting chance.” ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c(f"Orlan: “That I can do, and I shall see you up ahead.” ", color=Fore.BLUE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    print_s_c("He holds out his hand and you shake it firmly, before setting off towards the forest. ", color=Fore.WHITE, brightness=Style.BRIGHT)
+    time.sleep(1)
+    print()
+    time.sleep(2)
+    print()
+    print()
+    time.sleep(2)
+    print()
+    print()
+    print_c("  _____                   _     ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    print_c(" |  ___|__  _ __ ___  ___| |_   ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    print_c(" | |_ / _ \| '__/ _ \/ __| __|  ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    print_c(" |  _| (_) | | |  __/\__ \ |_   ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    print_c(" |_|  \___/|_|  \___||___/\__|  ", color=Fore.GREEN, brightness=Style.BRIGHT)
+    time.sleep(2)
+    print()
+    print()
+    time.sleep(2)
+    print()
     print()
 
 
@@ -318,7 +668,7 @@ def intro_text():
     print_s_c("Panic spread like wildfire, and the people began turning on each other. ", color=Fore.CYAN, brightness=Style.BRIGHT)
     time.sleep(1)
     print()
-    print_s_c("To make matters worse stories began to emerge of giant golems wandering the mists, spreading the shadow wherever they went. ", color=Fore.CYAN, brightness=Style.BRIGHT)
+    print_s_c("To make matters worse, stories began to emerge of giant golems wandering the mists, spreading the shadow wherever they went. ", color=Fore.CYAN, brightness=Style.BRIGHT)
     time.sleep(1)
     print()
     print_s_c("As if seized by some corruption; the local wildlife began to attack anyone they came across. ", color=Fore.CYAN, brightness=Style.BRIGHT)
@@ -1265,6 +1615,5 @@ def intro_to_char():
             print_s("Oh then lets try this again.")
             print()
             intro_to_char()
-
 
 intro_to_char()
