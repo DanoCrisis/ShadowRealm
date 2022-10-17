@@ -163,9 +163,9 @@ dwarf_warrior_image = [
 
 # ---------------- Base player stats --------------
 
-# ----num -----0----1-----2----3------4-------5-------6-------7--------8-----9-------10------11--------12------13-------14------15--------16-------17------18-------19-------20------21------22-----23------24------25-------26-----------------------27-----------28------------29
-# ----------Name - Lvl - Exp - HP - STa - STa reg - Mana - Mana Reg - STr - Attack - Foc - Mag Att - Tough - Phy Def - Armo - Mag Def - Fi Res - Fr Res-  Co Res - Speed - Acc - Evade - Crit -   Trait  - Race  - Class   Image                    Status     Skill Slots   Energy Type
-player = ["Player", 1 ,   0 ,  100 ,  0 ,    0 ,      0 ,      0 ,      0 ,    0   ,  0  ,    0     ,   5   ,    0   ,    0    ,  0    ,   0   ,    0  ,     0 ,     4.5  , 0.85 , 0.05 ,  0.05 ,  "None", "None", "None",   [],                   "Active" ,       2,           ""]
+# ----num -----0----1-----2----3------4-------5-------6-------7--------8-----9-------10------11--------12------13-------14------15--------16-------17------18-------19-------20------21------22-----23------24------25-------26-----------------------27-----------28------------29-------------30
+# ----------Name - Lvl - Exp - HP - STa - STa reg - Mana - Mana Reg - STr - Attack - Foc - Mag Att - Tough - Phy Def - Armo - Mag Def - Fi Res - Fr Res-  Co Res - Speed - Acc - Evade - Crit -   Trait  - Race  - Class   Image                    Status     Skill Slots   Energy Type-- Character Num
+player = ["Player", 1 ,   0 ,  100 ,  0 ,    0 ,      0 ,      0 ,      0 ,    0   ,  0  ,    0     ,   5   ,    0   ,    0    ,  0    ,   0   ,    0  ,     0 ,     4.5  , 0.85 , 0.05 ,  0.05 ,  "None", "None", "None",   [],                   "Active" ,       2,           "",           0]
 
 # ------ Increases per level-----------------------
 per_level_stats = [10, 0.2, 0.1,      0.2,    0.1,     0.15,  0.15,   2]
@@ -190,13 +190,13 @@ ditch_attack = ["Ditch attack", 1, 0.6, 0, 0, "A weak attack that can be perform
 last_reserve = ["Last reserve", 1, 0.6, 0, 0, "A weak spell that can be performed when low on mana. "]   
 regroup = ["Regroup", 2, 0, 0, 0, "Step back from battle and try to evade attacks while you recover your full stamina. "]
 focus = ["Focus", 2, 0, 0, 0, "Step back from battle and try to evade attacks while you recover your full mana. "]
-precision_attack = ["Precision attack", 0.8, 0.6, 0, 2, "A weak and slow attack, but it never misses. "]
+precision_attack = ["Precision attack", 0.9, 0.6, 0, 2, "A weak and slow attack, but it never misses. "]
 piercing_attack = ["Piercing attack", 1, 1, 0, 3, "A thrusting attack that negates enemy armour. "]
 fireball = ["Fireball", 1, 1.2, 0, 3, "Sends out a ball of flame, to one enemy, that hits for good damage and a chance to burn."]
 
-fury = ["Fury", 1, 1, 0, 3, "Harness the rage and attack, while increasing your speed and power for two turns. "]
+fury = ["Fury", 1, 1, 0, 3, "Harness the rage, and attack, while increasing your speed and power for two turns. "]
 critical_targeting = ["Critical targeting", 1, 1, 0, 3, "Assess the enemy's weaknesses; allowing you to score critical hits for two turns. "]
-heavy_blow = ["Heavy blow", 0.8, 1.2, 0.05, 3, "A heavy attack with a chance to knock your enemy down. "]
+heavy_blow = ["Heavy blow", 0.9, 1.2, 0.05, 3, "A heavy attack with a chance to knock your enemy down. "]
 
 
 skills_able_to_learn = []                                                           # Skills your player can learn at current time
@@ -211,7 +211,7 @@ stage = 1                                                                       
 #                          0        1        2        3        4       5               
 player_equiped_codes = [""        , ""     , "",     "",       "",     ""]
 player_equipped = [
-    [],
+    [],     
     [], 
     [],
     [], 
@@ -249,13 +249,15 @@ def character_sheet():
     spacing3 = 16 - (len(str(player[1])) + len(str(player[2])))
     spacing4 = 3 - len(str(player[9]))
     spacing5 = 3 - len(str(player[11]))
-    spacing6 = 2 - len(str(int(player[13] * 100)))
-    spacing7 = 2 - len(str(int(player[15] * 100)))
+    spacing6 = 2 - len(str(round(player[13] * 100)))
+    spacing7 = 2 - len(str(round(player[15] * 100)))
     spacing8 = 2 - len(str(player_equipped[0][1]))
     spacing9 = 2 - len(str(player[14]))
-    spacing10 = 2 - len(str(player[16]))
-    spacing11 = 2 - len(str(player[17]))
-    spacing12 = 2 - len(str(player[18]))
+    spacing10 = 2 - len(str(round(player[16]*0.375)))
+    spacing11 = 2 - len(str(round(player[17]*0.375)))
+    spacing12 = 2 - len(str(round(player[18]*0.375))) 
+    spacing13 = 3 - len(str(round(player[21]*100)))
+    spacing14 = 3 - len(str(round(player[22]*100)))
     print()
     print(" _____________________________________________________________________________________")
     print("|                                                                                     |")
@@ -266,30 +268,31 @@ def character_sheet():
     print(f"|                                                             {player[26][0]} |")
     print(f"| Level: {player[1]}     EXP: {player[2]}{spacing3*' '}                           {player[26][1]} |")
     if player[9] != 0:
-        print(f"|                                 Attack:               -  {int(player[9])}{spacing4*' '}{player[26][2]} |")
+        print(f"|                                 Attack:               -  {round(player[9])}{spacing4*' '}{player[26][2]} |")
     if player[11] != 0:
-        print(f"|                                 Magical Attack:       -  {int(player[11])}{spacing5*' '}{player[26][2]} |")
+        print(f"|                                 Magical Attack:       -  {round(player[11])}{spacing5*' '}{player[26][2]} |")
     if player[0] == "Immortal":
-        print(f"| Max Health          - {player[3]}     - Weapon Power:     - {spacing8*' '}{int(player_equipped[0][1])}  {player[26][3]} |")    
+        print(f"| Max Health          - {player[3]}     - Weapon Power:     - {spacing8*' '}{round(player_equipped[0][1])}  {player[26][3]} |")    
     else:
-        print(f"| Max Health          - {player[3]}         - Weapon Power:     - {spacing8*' '}{int(player_equipped[0][1])}  {player[26][3]} |")  
+        print(f"| Max Health          - {player[3]}         - Weapon Power:     - {spacing8*' '}{round(player_equipped[0][1])}  {player[26][3]} |")  
     if player[4] != 0:
         print(f"| Max Stamina         - {math.floor(player[4])}                                     {player[26][4]} |")
-        print(f"| Stamina Regen Speed - {math.floor(player[5])}         Physical Defence:     - {spacing6*' '}{int(player[13] * 100) } %{player[26][5]} |")
+        print(f"| Stamina Regen Speed - {math.floor(player[5])}         Physical Defence:     - {spacing6*' '}{round(player[13] * 100) } %{player[26][5]} |")
     if player[6] != 0:
         print(f"| Max Mana            - {math.floor(player[6])}                                     {player[26][4]} |")
         print(f"| Mana Regen Speed    - {math.floor(player[7])}         Physical Defence:     - {spacing6*' '}{int(player[13] * 100)} %{player[26][5]} |")
     if player[8] != 0:
-        print(f"| Strength            - {player[8]:.1f}         - Armour:           - {spacing9*' '}{int(player[14])}  {player[26][6]} |")
+        print(f"| Strength            - {player[8]:.1f}         - Armour:           - {spacing9*' '}{round(player[14])}  {player[26][6]} |")
     if player[10] != 0:
-        print(f"| Focus               - {player[10]:.1f}         - Armour:           - {spacing9*' '}{int(player[14])}  {player[26][6]} |")
-    print(f"| Toughness           - {int(player[12])}                                    {player[26][7]} |")
-    print(f"| Speed               - {player[19]:.1f}       Magical Defence:      - {spacing7*' '}{int(player[15] * 100)} %{player[26][8]} |")
-    print(f"| Accuracy            - {int(player[20] * 100)} %       - Fire Resist:       - {spacing10*' '}{player[16]}  {player[26][9]} |")
-    print(f"| Evasion             - {int(player[21] * 100)} %       - Frost Resist:      - {spacing11*' '}{player[17]}  {player[26][10]} |")
-    print(f"| Critical Chance     - {int(player[22] * 100)} %       - Corruption Resist: - {spacing12*' '}{player[18]}                          |")
+        print(f"| Focus               - {player[10]:.1f}         - Armour:           - {spacing9*' '}{round(player[14])}  {player[26][6]} |")
+    print(f"| Toughness           - {round(player[12])}                                    {player[26][7]} |")
+    print(f"| Speed               - {player[19]:.1f}       Magical Defence:      - {spacing7*' '}{round(player[15] * 100)} %{player[26][8]} |")
+    print(f"| Accuracy            - {round(player[20] * 100)} %       - Fire Resist:       - {spacing10*' '}{round(player[16]*0.375)} %{player[26][9]} |")
+    print(f"| Evasion             - {round(player[21] * 100)} %  {spacing13*' '}    - Frost Resist:      - {spacing11*' '}{round(player[17]*0.375)} %{player[26][10]} |")
+    print(f"| Critical Chance     - {round(player[22] * 100)} %  {spacing14*' '}    - Corruption Resist: - {spacing12*' '}{round(player[18]*0.375)} %                        |")
     print("|_____________________________________________________________________________________|")
     print("")
+    print(player[0:26])        #  xqf remove after testing
 
 
 # -------------------------------------------------- Makeshift Camp Area ---------------------------------------------------------------------------
@@ -1294,6 +1297,7 @@ def dwarf_check():
         player[22] = 0
         player[25] = "Wizard"
         player[26] =  dwarf_wizard_image[:]
+        player[30] = 9
         player[29] = "Stamina"
 
         per_level_stats[3] = 0
@@ -1315,46 +1319,46 @@ def dwarf_check():
 def class_select():
     print_s(f"So what class is {player[0]} going to be?")
     print()
-    time.sleep(0.8)
-    print("Warrior:")
-    print()
-    print()
-    time.sleep(1)
-    print_s("Warriors are fast, agile and hit with high damage.")
-    print()
-    time.sleep(2.5)
-    print_s("They weild two handed weapons and wear a trinket around their necks.")
-    print()
-    time.sleep(2.5)
-    print_s("They wear light armour that offers a mix of protection and movement.")
-    print()
-    time.sleep(2.5)
-    print("Knight:")
-    print()
-    print()
-    time.sleep(1)
-    print_s("Knights are slow to move, hit for medium damage, but are extremely sturdy.")
-    print()
-    time.sleep(2.5)
-    print_s("They weild a one handed weapon with a shield.")
-    print()
-    time.sleep(2.5)
-    print_s("They wear heavy armour that is high in defence, but suffers in movement.")
-    print()
-    time.sleep(2.5)
-    print("Wizard:")
-    print()
-    print()
-    time.sleep(1)
-    print_s("Wizards are not the hardiest of folk, but they make up for it with powerful spells.")
-    print()
-    time.sleep(2.5)
-    print_s("They weild staffs or wands, along with a magical catalyst.")
-    print()
-    time.sleep(2.5)
-    print_s("They wear robes that offer scant physical, but great magical protection.")
-    print()
-    time.sleep(2.5)
+    time.sleep(0.8) 
+    # print("Warrior:")   ------------------------------------------xqf xqf uncomment this when doen testing
+    # print()
+    # print()
+    # time.sleep(1)
+    # print_s("Warriors are fast, agile and hit with high damage.")
+    # print()
+    # time.sleep(2.5)
+    # print_s("They weild two handed weapons and wear a trinket around their necks.")
+    # print()
+    # time.sleep(2.5)
+    # print_s("They wear light armour that offers a mix of protection and movement.")
+    # print()
+    # time.sleep(2.5)
+    # print("Knight:")
+    # print()
+    # print()
+    # time.sleep(1)
+    # print_s("Knights are slow to move, hit for medium damage, but are extremely sturdy.")
+    # print()
+    # time.sleep(2.5)
+    # print_s("They weild a one handed weapon with a shield.")
+    # print()
+    # time.sleep(2.5)
+    # print_s("They wear heavy armour that is high in defence, but suffers in movement.")
+    # print()
+    # time.sleep(2.5)
+    # print("Wizard:")
+    # print()
+    # print()
+    # time.sleep(1)
+    # print_s("Wizards are not the hardiest of folk, but they make up for it with powerful spells.")
+    # print()
+    # time.sleep(2.5)
+    # print_s("They weild staffs or wands, along with a magical catalyst.")
+    # print()
+    # time.sleep(2.5)
+    # print_s("They wear robes that offer scant physical, but great magical protection.")
+    # print()
+    # time.sleep(2.5)
     print()
     print_s("Which class would you like to play as?")
     print()
@@ -1381,10 +1385,13 @@ def class_select():
         player[25] = "Warrior"
         if player[24] == "Human":
             player[26] =  human_warrior_image[:]
+            player[30] = 1
         elif player[24] == "Elf":
             player[26] =  elf_warrior_image[:]
+            player[30] = 2
         elif player[24] == "Dwarf":
             player[26] =  dwarf_warrior_image[:]
+            player[30] = 3
         player[29] = "Stamina"
 
         per_level_stats[3] = 0
@@ -1412,10 +1419,13 @@ def class_select():
         player[25] = "Knight"
         if player[24] == "Human":
             player[26] =  human_knight_image[:]
+            player[30] = 5
         elif player[24] == "Elf":
             player[26] =  elf_knight_image[:]
+            player[30] = 6
         elif player[24] == "Dwarf":
             player[26] =  dwarf_knight_image[:]
+            player[30] = 7
         player[29] = "Stamina"
 
         per_level_stats[3] = 0
@@ -1448,8 +1458,10 @@ def class_select():
             player[25] = "Wizard"
             if player[24] == "Human":
                 player[26] =  human_wizard_image[:]
+                player[30] = 7
             elif player[24] == "Elf":
                 player[26] =  elf_wizard_image[:]
+                player[30] = 8
             player[29] = "Mana"
         
 
@@ -1482,27 +1494,27 @@ def race_select():
     print_s(f"{player[0]} can be one of three races:")
     print()
     time.sleep(0.8)
-    print("Human:")
-    print()
-    print()
-    time.sleep(1)
-    print_s("Humans are quick and sturdy, they excel as warriors, but make decent wizards also.")
-    print()
-    time.sleep(2.5)
-    print("Dwarf:")
-    print()
-    print()
-    time.sleep(1)
-    print_s("Dwarves are strong and tough, they make brilliant knights, but cannot use magic.")
-    print()
-    time.sleep(2.5)
-    print("Elf:")
-    print()
-    print()
-    time.sleep(1)
-    print_s("Elves are natural magic users, but their speed and accuracy can also make them good warriors.")
-    print()
-    time.sleep(2.5)
+    # print("Human:")       xqf uncomment after tests
+    # print()
+    # print()
+    # time.sleep(1)
+    # print_s("Humans are quick and sturdy, they excel as warriors, but make decent wizards also.")
+    # print()
+    # time.sleep(2.5)
+    # print("Dwarf:")
+    # print()
+    # print()
+    # time.sleep(1)
+    # print_s("Dwarves are strong and tough, they make brilliant knights, but cannot use magic.")
+    # print()
+    # time.sleep(2.5)
+    # print("Elf:")
+    # print()
+    # print()
+    # time.sleep(1)
+    # print_s("Elves are natural magic users, but their speed and accuracy can also make them good warriors.")
+    # print()
+    # time.sleep(2.5)
     print()
     print_s("Which race would you like to play as?")
     print()
